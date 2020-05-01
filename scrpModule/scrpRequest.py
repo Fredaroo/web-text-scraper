@@ -7,8 +7,7 @@ import requests
 
 
 def scrp_loop(data_size):
-    i = 1
-    j = 2
+    i = 0
 
     while i < data_size:
         fetched_url = dbArch.get_url(i)

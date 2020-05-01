@@ -29,7 +29,11 @@ def import_data(file_name):
         with open(file_name, 'r') as fin:
             # csv.DictReader uses first line in file for column headings
             dr = csv.DictReader(fin)  # comma is default delimiter
-            to_db = [(i['uuid'], i['url']) for i in dr]
+            try:
+                to_db = [(i['uuid'], i['url']) for i in dr]
+            except KeyError:
+                print("[ERROR] The csv you provided does not follow the format guidelines")
+                conn.close()
         cursor.executemany("INSERT INTO urls (uuid, url) VALUES (?, ?);", to_db)
         conn.commit()
         print("[OK] data loaded successfully")
@@ -56,4 +60,4 @@ def upload_content(url_content, i):
     cursor = conn.cursor()
     cursor.execute("UPDATE urls SET content = ? WHERE id = ?", (url_content, i))
     conn.commit()
-    print("uploaded" + str(i))
+    print("[OK] Reached --- uploaded Nb :" + str(i))
