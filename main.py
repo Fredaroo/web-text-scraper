@@ -11,6 +11,8 @@ query = input("Would you like to import a new data source? [yes/no]:")
 if query == "yes":
     file_name = dbSrc.import_source()
     dbArch.import_data(file_name)
+    data_size = dbArch.get_length()
+    scReq.scrp_loop(data_size)
 else:
     query = input("Would you like to continue where you left off? [yes/no]:")
     if query == "yes":
