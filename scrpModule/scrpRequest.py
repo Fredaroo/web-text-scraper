@@ -4,10 +4,16 @@ import requests
 
 # To be implemented
 # import threading
+i = 1
+
+
+def set_initial_loc(fetched_length):
+    global i
+    i = fetched_length
 
 
 def scrp_loop(data_size):
-    i = 0
+    global i
 
     while i < data_size:
         fetched_url = dbArch.get_url(i)

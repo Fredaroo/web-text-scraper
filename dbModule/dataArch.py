@@ -56,6 +56,13 @@ def get_url(id_value):
     return fetched_url[0]
 
 
+def get_last_range():
+    cursor = conn.cursor()
+    cursor.execute("SELECT MAX(id) FROM urls WHERE content IS NOT NULL;")
+    fetched_length = cursor.fetchone()
+    return fetched_length[0]
+
+
 def upload_content(url_content, i):
     cursor = conn.cursor()
     cursor.execute("UPDATE urls SET content = ? WHERE id = ?", (url_content, i))
