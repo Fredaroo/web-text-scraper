@@ -20,27 +20,53 @@ def scrp_loop(data_size):
         if fetched_url == "NA":
             i = i + 1
         else:
-            response = requests.get(fetched_url)
-            html_content = BeautifulSoup(response.text, "html.parser")
-            text = html_content.find_all(text=True)
-            output = ''
-            blacklist = [
-                '[document]',
-                'noscript',
-                'header',
-                'html',
-                'meta',
-                'head',
-                'input',
-                'script',
-                'style',
-                'footer',
-                'button',
-                'li',
-                'span',
-            ]
-            for t in text:
-                if t.parent.name not in blacklist:
-                    output += '{} '.format(t)
-            dbArch.upload_content(output, i)
-            i = i + 1
+            try:
+                response = requests.get(fetched_url)
+                html_content = BeautifulSoup(response.text, "html.parser")
+                text = html_content.find_all(text=True)
+                output = ''
+                blacklist = [
+                    '[document]',
+                    'noscript',
+                    'header',
+                    'html',
+                    'meta',
+                    'head',
+                    'input',
+                    'script',
+                    'style',
+                    'footer',
+                    'button',
+                    'li',
+                    'span',
+                ]
+                for t in text:
+                    if t.parent.name not in blacklist:
+                        output += '{} '.format(t)
+                dbArch.upload_content(output, i)
+                i = i + 1
+            # Queue error catches :
+            except requests.exceptions.ConnectionError:
+                output = "HTTP_ERROR"
+                dbArch.upload_content(output, i)
+                i = i + 1
+            except requests.HTTPError:
+                output = "HTTP_ERROR"
+                dbArch.upload_content(output, i)
+                i = i + 1
+            except requests.exceptions.BaseHTTPError:
+                output = "HTTP_ERROR"
+                dbArch.upload_content(output, i)
+                i = i + 1
+            except requests.exceptions.InvalidURL:
+                output = "HTTP_ERROR"
+                dbArch.upload_content(output, i)
+                i = i + 1
+            except requests.exceptions.StreamConsumedError:
+                output = "HTTP_ERROR"
+                dbArch.upload_content(output, i)
+                i = i + 1
+            except requests.exceptions.ChunkedEncodingError:
+                output = "HTTP_ERROR"
+                dbArch.upload_content(output, i)
+                i = i + 1

@@ -21,25 +21,38 @@ def initiate_connection():
     except sqlite3.OperationalError:
         print("[ERROR] Connection not initiated - terminate script")
         conn.close()
+        exit()
 
 
 def import_data(file_name):
     try:
         cursor = conn.cursor()
+        cursor.execute("DROP TABLE urls;",)
+        conn.commit()
+        cursor.execute("""
+                CREATE TABLE IF NOT EXISTS urls(
+                     id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE,
+                     uuid INTEGER,
+                     url TEXT,
+                     content TEXT
+                )
+                """)
+        conn.commit()
+    except sqlite3.Error:
+        print("[Error] - Could not delete existing data")
+    try:
+        cursor = conn.cursor()
         with open(file_name, 'r') as fin:
             # csv.DictReader uses first line in file for column headings
             dr = csv.DictReader(fin)  # comma is default delimiter
-            try:
-                to_db = [(i['uuid'], i['url']) for i in dr]
-            except KeyError:
-                print("[ERROR] The csv you provided does not follow the format guidelines")
-                conn.close()
+            to_db = [(i['uuid'], i['url']) for i in dr]
         cursor.executemany("INSERT INTO urls (uuid, url) VALUES (?, ?);", to_db)
         conn.commit()
         print("[OK] data loaded successfully")
     except sqlite3.Error:
         print("[ERROR] There was an error importing your data - terminate script")
         conn.close()
+        exit()
 
 
 def get_length():
@@ -60,7 +73,10 @@ def get_last_range():
     cursor = conn.cursor()
     cursor.execute("SELECT MAX(id) FROM urls WHERE content IS NOT NULL;")
     fetched_length = cursor.fetchone()
-    return fetched_length[0]
+    if fetched_length[0] is None:
+        return 1
+    else:
+        return fetched_length[0]
 
 
 def upload_content(url_content, i):
