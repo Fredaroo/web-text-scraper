@@ -70,3 +70,7 @@ def scrp_loop(data_size):
                 output = "HTTP_ERROR"
                 dbArch.upload_content(output, i)
                 i = i + 1
+            except requests.exceptions.ReadTimeout:
+                output = "HTTP_ERROR"
+                dbArch.upload_content(output, i)
+                i = i + 1
