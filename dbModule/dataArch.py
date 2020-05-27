@@ -45,7 +45,13 @@ def import_data(file_name):
         with open(file_name, 'r') as fin:
             # csv.DictReader uses first line in file for column headings
             dr = csv.DictReader(fin)  # comma is default delimiter
-            to_db = [(i['uuid'], i['url']) for i in dr]
+            try:
+                to_db = [(i['uuid'], i['url']) for i in dr]
+            except KeyError as e:
+                print(e)
+                print("[Error] - Provided csv file does not follow the guidelines stated above")
+                conn.close()
+                exit()
         cursor.executemany("INSERT INTO urls (uuid, url) VALUES (?, ?);", to_db)
         conn.commit()
         print("[OK] data loaded successfully")

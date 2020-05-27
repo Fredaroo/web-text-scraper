@@ -21,7 +21,7 @@ def scrp_loop(data_size):
             i = i + 1
         else:
             try:
-                response = requests.get(fetched_url)
+                response = requests.get(fetched_url, verify=False, timeout=60)
                 html_content = BeautifulSoup(response.text, "html.parser")
                 text = html_content.find_all(text=True)
                 output = ''
